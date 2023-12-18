@@ -1,0 +1,32 @@
+version: "3"
+networks:
+  bridge:
+    driver: bridge
+services:
+  sqlserver:
+    container_name: sql_server
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Mk@12345
+    ports:
+      - 1433:1433
+    restart: always
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
+  aspnetcore:
+    container_name: webapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    # environment:
+    #   - CourseDbContext=Server=sqlserver;Database=CourseManagement;User Id=sa;password=Mk@12345;Trusted_Connection=False;MultipleActiveResultSets=true;Encrypt=False
+    depends_on:
+      - sqlserver
+    restart: always
+
+volumes:
+  sqlserver-data:
